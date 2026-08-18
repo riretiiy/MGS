@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>마탑의 기록서 (Mage Tower Archives)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Serif KR', serif;
+            background-color: #0b0d12;
+            color: #d1c7b7;
+            overflow-x: hidden;
+        }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        
+        /* Parallax Background Gradient Elements */
+        .bg-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        
+        /* Glassmorphism Fantasy Card */
+        .tower-card {
+            background: rgba(18, 22, 31, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(184, 153, 90, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(184, 153, 90, 0.05);
+        }
+        
+        .tower-input {
+            background: rgba(10, 13, 18, 0.8);
+            border: 1px solid rgba(184, 153, 90, 0.3);
+            color: #e6dfd3;
+            transition: all 0.3s ease;
+        }
+        .tower-input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+        }
+        
+        /* Scroll progress bar */
+        #progress-bar {
+            background: linear-gradient(90deg, #3b2d54, #8b6b23, #d4af37);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Fixed Dynamic Background Layers (Vibe & Parallax) -->
+    <div id="bg-forest" class="bg-layer opacity-100" style="background: radial-gradient(circle at 50% 30%, #17241d 0%, #080c0a 80%);"></div>
+    <div id="bg-tower" class="bg-layer opacity-0" style="background: radial-gradient(circle at 50% 50%, #1c182b 0%, #09070e 80%);"></div>
+    <div id="bg-sanctum" class="bg-layer opacity-0" style="background: radial-gradient(circle at 50% 70%, #2b1f14 0%, #0d0905 80%);"></div>
+    
+    <!-- Ambient Particles/Glow -->
+    <div class="fixed inset-0 pointer-events-none opacity-30" style="background-image: radial-gradient(#d4af37 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+    <!-- Top Progress Indicator -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-gray-900 z-50">
+        <div id="progress-bar" class="h-full w-0 transition-all duration-300"></div>
+    </div>
+
+    <!-- Main Mobile Container -->
+    <main class="relative z-10 max-w-md mx-auto px-5 py-12 flex flex-col gap-16">
+        
+        <!-- Header -->
+        <header class="text-center space-y-2 pt-4">
+            <p class="font-cinzel text-xs tracking-[0.3em] text-amber-500/80">ANCIENT MAGE TOWER</p>
+            <h1 class="text-2xl font-bold tracking-wide text-amber-100 font-cinzel">마탑의 양식 기록서</h1>
+            <p class="text-xs text-amber-200/50">숲 속 깊은 곳, 마탑의 대마법사에게 전달할 기록을 작성하세요.</p>
+        </header>
+
+        <!-- Step 1: Forest Entrance (Basic Info) -->
+        <section id="step-1" class="tower-card rounded-xl p-6 space-y-4">
+            <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                <span class="font-cinzel text-amber-400 font-bold text-lg">01.</span>
+                <h2 class="text-sm font-semibold text-amber-200">기록자의 신원 (기본 정보)</h2>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block mb-1 text-amber-300/70">발신자 / 칭호</label>
+                    <input type="text" id="sender" placeholder="예: 방랑 기사 엘릭" class="w-full p-3 rounded-lg tower-input text-sm">
+                </div>
+                <div>
+                    <label class="block mb-1 text-amber-300/70">수신 부서 / 마탑 계파</label>
+                    <select id="department" class="w-full p-3 rounded-lg tower-input text-sm">
+                        <option value="연금술 학파">연금술 학파 (Alchemy)</option>
+                        <option value="원소마법 학파">원소마법 학파 (Elementalism)</option>
+                        <option value="고대문자 연구회">고대문자 연구회 (Runes)</option>
+                        <option value="마탑 중앙 집행부">마탑 중앙 집행부 (Central Council)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Tower Stairs (Core Content) -->
+        <section id="step-2" class="tower-card rounded-xl p-6 space-y-4">
+            <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                <span class="font-cinzel text-amber-400 font-bold text-lg">02.</span>
+                <h2 class="text-sm font-semibold text-amber-200">보고 안건 (상세 내용)</h2>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block mb-1 text-amber-300/70">안건 제목</label>
+                    <input type="text" id="subject" placeholder="예: 붉은 숲 마력 이상 징후 보고" class="w-full p-3 rounded-lg tower-input text-sm">
+                </div>
+                <div>
+                    <label class="block mb-1 text-amber-300/70">상세 기록 내용</label>
+                    <textarea id="content" rows="4" placeholder="마탑에 전달할 핵심 내용을 자유롭게 적으세요..." class="w-full p-3 rounded-lg tower-input text-sm leading-relaxed"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 3: Sanctum Seal (Urgency & Action) -->
+        <section id="step-3" class="tower-card rounded-xl p-6 space-y-4">
+            <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                <span class="font-cinzel text-amber-400 font-bold text-lg">03.</span>
+                <h2 class="text-sm font-semibold text-amber-200">마법 봉인 (중요도 및 요청)</h2>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block mb-1 text-amber-300/70">긴급도 (마력 등급)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setUrgency('통상')" class="urgency-btn p-2 border border-amber-500/30 rounded text-center active:bg-amber-500/20">통상 (Regular)</button>
+                        <button type="button" onclick="setUrgency('중요')" class="urgency-btn p-2 border border-amber-500/30 rounded text-center active:bg-amber-500/20">중요 (High)</button>
+                        <button type="button" onclick="setUrgency('긴급')" class="urgency-btn p-2 border border-amber-500/30 rounded text-center active:bg-amber-500/20 text-red-400">긴급 (Urgent)</button>
+                    </div>
+                </div>
+                
+                <button onclick="generateScroll()" class="w-full py-4 mt-2 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-amber-100 font-bold rounded-lg shadow-lg border border-amber-400/40 active:scale-95 transition-transform font-cinzel text-sm tracking-wider">
+                    양식서 양각 발현 (GENERATE)
+                </button>
+            </div>
+        </section>
+
+        <!-- Result Parchment Section -->
+        <section id="result-section" class="hidden tower-card rounded-xl p-6 space-y-4 border-amber-400/60 bg-amber-950/20">
+            <div class="text-center border-b border-amber-500/30 pb-3">
+                <p class="text-xs text-amber-400 font-cinzel">OFFICIAL DOCUMENT</p>
+                <h3 class="text-lg font-bold text-amber-100">마탑 공식 양식 기록서</h3>
+            </div>
+            
+            <div id="formatted-result" class="text-xs leading-relaxed font-mono whitespace-pre-wrap bg-black/50 p-4 rounded border border-amber-500/20 text-amber-200/90">
+                <!-- Script inserts output here -->
+            </div>
+
+            <button onclick="copyToClipboard()" class="w-full py-3 bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs rounded font-semibold active:bg-amber-500/40">
+                기록서 복사하기
+            </button>
+        </section>
+
+    </main>
+
+    <script>
+        let selectedUrgency = '통상';
+
+        function setUrgency(val) {
+            selectedUrgency = val;
+            document.querySelectorAll('.urgency-btn').forEach(btn => {
+                if(btn.innerText.includes(val)) {
+                    btn.classList.add('bg-amber-500/30', 'border-amber-400');
+                } else {
+                    btn.classList.remove('bg-amber-500/30', 'border-amber-400');
+                }
+            });
+        }
+
+        // Scroll Background & Progress Effect
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = scrollTop / docHeight;
+
+            // Progress Bar
+            document.getElementById('progress-bar').style.width = (scrollPercent * 100) + '%';
+
+            // Parallax Background Transition
+            const forestBg = document.getElementById('bg-forest');
+            const towerBg = document.getElementById('bg-tower');
+            const sanctumBg = document.getElementById('bg-sanctum');
+
+            if (scrollPercent < 0.35) {
+                forestBg.style.opacity = '1';
+                towerBg.style.opacity = '0';
+                sanctumBg.style.opacity = '0';
+            } else if (scrollPercent >= 0.35 && scrollPercent < 0.7) {
+                forestBg.style.opacity = '0';
+                towerBg.style.opacity = '1';
+                sanctumBg.style.opacity = '0';
+            } else {
+                forestBg.style.opacity = '0';
+                towerBg.style.opacity = '0';
+                sanctumBg.style.opacity = '1';
+            }
+        });
+
+        // Form Transformation Logic
+        function generateScroll() {
+            const sender = document.getElementById('sender').value || '익명의 기록자';
+            const dept = document.getElementById('department').value;
+            const subject = document.getElementById('subject').value || '무제';
+            const content = document.getElementById('content').value || '내용 없음';
+            const today = new Date().toISOString().split('T')[0];
+
+            const formattedText = `[마탑 공식 양식서 - 제 ${Math.floor(Math.random() * 8999 + 1000)}호]
+────────────────────────
+■ 발 신 자 : ${sender}
+■ 수신부서 : ${dept}
+■ 작성일자 : ${today}
+■ 긴급등급 : [${selectedUrgency}]
+────────────────────────
+■ 안 건 명 : ${subject}
+
+■ 상세 내용 :
+${content}
+
+────────────────────────
+위 기록은 외딴 숲 마탑의 인장에 의해 정식 양식으로 인가되었습니다.`;
+
+            document.getElementById('formatted-result').innerText = formattedText;
+            const resultSec = document.getElementById('result-section');
+            resultSec.classList.remove('hidden');
+            resultSec.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('formatted-result').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('마탑 기록서가 클립보드에 복사되었습니다.');
+            });
+        }
+    </script>
+</body>
+</html>
