@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>마탑의 기록서 (Mage Tower Archives)</title>
+    <title>마탑 입산 허가서 발급 시스템</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -12,27 +12,27 @@
             background-color: #0b0d12;
             color: #d1c7b7;
             overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
         .font-cinzel { font-family: 'Cinzel', serif; }
         
-        /* Parallax Background Gradient Elements */
         .bg-layer {
             position: fixed;
             inset: 0;
             pointer-events: none;
             transition: opacity 0.8s ease;
+            z-index: 0;
         }
         
-        /* Glassmorphism Fantasy Card */
         .tower-card {
-            background: rgba(18, 22, 31, 0.75);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(184, 153, 90, 0.25);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(184, 153, 90, 0.05);
+            background: rgba(18, 22, 31, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(184, 153, 90, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
         }
         
         .tower-input {
-            background: rgba(10, 13, 18, 0.8);
+            background: rgba(10, 13, 18, 0.9);
             border: 1px solid rgba(184, 153, 90, 0.3);
             color: #e6dfd3;
             transition: all 0.3s ease;
@@ -42,198 +42,706 @@
             border-color: #d4af37;
             box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
         }
-        
-        /* Scroll progress bar */
-        #progress-bar {
-            background: linear-gradient(90deg, #3b2d54, #8b6b23, #d4af37);
+
+        .btn-gold {
+            background: linear-gradient(135deg, #8b6b23 0%, #b8995a 50%, #8b6b23 100%);
+            color: #000;
+            font-weight: bold;
+            border: 1px solid #d4af37;
+        }
+        .btn-gold:active {
+            transform: scale(0.98);
+        }
+
+        .modal-bg {
+            background: rgba(5, 7, 10, 0.85);
+            backdrop-filter: blur(6px);
+        }
+
+        /* custom scrollbar for output */
+        textarea::-webkit-scrollbar {
+            width: 6px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: rgba(184, 153, 90, 0.4);
+            border-radius: 3px;
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen relative pb-20">
 
-    <!-- Fixed Dynamic Background Layers (Vibe & Parallax) -->
+    <!-- Backgrounds -->
     <div id="bg-forest" class="bg-layer opacity-100" style="background: radial-gradient(circle at 50% 30%, #17241d 0%, #080c0a 80%);"></div>
     <div id="bg-tower" class="bg-layer opacity-0" style="background: radial-gradient(circle at 50% 50%, #1c182b 0%, #09070e 80%);"></div>
     <div id="bg-sanctum" class="bg-layer opacity-0" style="background: radial-gradient(circle at 50% 70%, #2b1f14 0%, #0d0905 80%);"></div>
-    
-    <!-- Ambient Particles/Glow -->
-    <div class="fixed inset-0 pointer-events-none opacity-30" style="background-image: radial-gradient(#d4af37 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <div class="fixed inset-0 pointer-events-none opacity-20" style="background-image: radial-gradient(#d4af37 1px, transparent 1px); background-size: 32px 32px;"></div>
 
-    <!-- Top Progress Indicator -->
-    <div class="fixed top-0 left-0 w-full h-1 bg-gray-900 z-50">
-        <div id="progress-bar" class="h-full w-0 transition-all duration-300"></div>
+    <!-- Modal Popup -->
+    <div id="dialog-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-bg hidden">
+        <div class="tower-card w-full max-w-sm rounded-xl p-6 text-center space-y-4 border-amber-400/50">
+            <div id="modal-icon" class="text-3xl">🔮</div>
+            <p id="modal-text" class="text-sm text-amber-100 leading-relaxed font-semibold"></p>
+            <button onclick="closeModal()" class="w-full py-2.5 rounded-lg btn-gold text-xs tracking-wider">확인</button>
+        </div>
     </div>
 
-    <!-- Main Mobile Container -->
-    <main class="relative z-10 max-w-md mx-auto px-5 py-12 flex flex-col gap-16">
-        
+    <!-- Main Container -->
+    <main class="relative z-10 max-w-md mx-auto px-4 py-8 space-y-8">
+
         <!-- Header -->
-        <header class="text-center space-y-2 pt-4">
-            <p class="font-cinzel text-xs tracking-[0.3em] text-amber-500/80">ANCIENT MAGE TOWER</p>
-            <h1 class="text-2xl font-bold tracking-wide text-amber-100 font-cinzel">마탑의 양식 기록서</h1>
-            <p class="text-xs text-amber-200/50">숲 속 깊은 곳, 마탑의 대마법사에게 전달할 기록을 작성하세요.</p>
+        <header class="text-center space-y-2">
+            <p class="font-cinzel text-xs tracking-[0.3em] text-amber-500/80">OUTER FOREST MAGE TOWER</p>
+            <h1 class="text-2xl font-bold tracking-wide text-amber-100 font-cinzel">마탑 방문자 통행 기록</h1>
+            <p class="text-xs text-amber-200/50">외딴 숲 마탑의 명부에 신원을 작성하고 통행 허가증을 발급받으세요.</p>
         </header>
 
-        <!-- Step 1: Forest Entrance (Basic Info) -->
-        <section id="step-1" class="tower-card rounded-xl p-6 space-y-4">
-            <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
-                <span class="font-cinzel text-amber-400 font-bold text-lg">01.</span>
-                <h2 class="text-sm font-semibold text-amber-200">기록자의 신원 (기본 정보)</h2>
-            </div>
-            
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block mb-1 text-amber-300/70">발신자 / 칭호</label>
-                    <input type="text" id="sender" placeholder="예: 방랑 기사 엘릭" class="w-full p-3 rounded-lg tower-input text-sm">
-                </div>
-                <div>
-                    <label class="block mb-1 text-amber-300/70">수신 부서 / 마탑 계파</label>
-                    <select id="department" class="w-full p-3 rounded-lg tower-input text-sm">
-                        <option value="연금술 학파">연금술 학파 (Alchemy)</option>
-                        <option value="원소마법 학파">원소마법 학파 (Elementalism)</option>
-                        <option value="고대문자 연구회">고대문자 연구회 (Runes)</option>
-                        <option value="마탑 중앙 집행부">마탑 중앙 집행부 (Central Council)</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-
-        <!-- Step 2: Tower Stairs (Core Content) -->
-        <section id="step-2" class="tower-card rounded-xl p-6 space-y-4">
-            <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
-                <span class="font-cinzel text-amber-400 font-bold text-lg">02.</span>
-                <h2 class="text-sm font-semibold text-amber-200">보고 안건 (상세 내용)</h2>
-            </div>
-            
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block mb-1 text-amber-300/70">안건 제목</label>
-                    <input type="text" id="subject" placeholder="예: 붉은 숲 마력 이상 징후 보고" class="w-full p-3 rounded-lg tower-input text-sm">
-                </div>
-                <div>
-                    <label class="block mb-1 text-amber-300/70">상세 기록 내용</label>
-                    <textarea id="content" rows="4" placeholder="마탑에 전달할 핵심 내용을 자유롭게 적으세요..." class="w-full p-3 rounded-lg tower-input text-sm leading-relaxed"></textarea>
-                </div>
-            </div>
-        </section>
-
-        <!-- Step 3: Sanctum Seal (Urgency & Action) -->
-        <section id="step-3" class="tower-card rounded-xl p-6 space-y-4">
-            <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
-                <span class="font-cinzel text-amber-400 font-bold text-lg">03.</span>
-                <h2 class="text-sm font-semibold text-amber-200">마법 봉인 (중요도 및 요청)</h2>
-            </div>
-            
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block mb-1 text-amber-300/70">긴급도 (마력 등급)</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button type="button" onclick="setUrgency('통상')" class="urgency-btn p-2 border border-amber-500/30 rounded text-center active:bg-amber-500/20">통상 (Regular)</button>
-                        <button type="button" onclick="setUrgency('중요')" class="urgency-btn p-2 border border-amber-500/30 rounded text-center active:bg-amber-500/20">중요 (High)</button>
-                        <button type="button" onclick="setUrgency('긴급')" class="urgency-btn p-2 border border-amber-500/30 rounded text-center active:bg-amber-500/20 text-red-400">긴급 (Urgent)</button>
-                    </div>
-                </div>
-                
-                <button onclick="generateScroll()" class="w-full py-4 mt-2 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-amber-100 font-bold rounded-lg shadow-lg border border-amber-400/40 active:scale-95 transition-transform font-cinzel text-sm tracking-wider">
-                    양식서 양각 발현 (GENERATE)
+        <!-- Mode Select -->
+        <section id="sec-mode" class="tower-card rounded-xl p-6 space-y-4">
+            <h2 class="text-sm font-semibold text-amber-200 border-b border-amber-500/20 pb-2 text-center">절차 유형 선택</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="selectMode('약식')" class="p-4 rounded-lg border border-amber-500/30 text-center hover:border-amber-400 bg-amber-950/20 active:scale-95 transition">
+                    <div class="font-bold text-amber-300 text-sm">약식 절차</div>
+                    <div class="text-[10px] text-amber-200/50 mt-1">최대 500자 제한<br>간단 신원 작성</div>
+                </button>
+                <button onclick="selectMode('정규')" class="p-4 rounded-lg border border-amber-500/30 text-center hover:border-amber-400 bg-amber-950/20 active:scale-95 transition">
+                    <div class="font-bold text-amber-300 text-sm">정규 절차</div>
+                    <div class="text-[10px] text-amber-200/50 mt-1">최대 1500자 제한<br>상세 마력/관계 기록</div>
                 </button>
             </div>
         </section>
 
-        <!-- Result Parchment Section -->
-        <section id="result-section" class="hidden tower-card rounded-xl p-6 space-y-4 border-amber-400/60 bg-amber-950/20">
-            <div class="text-center border-b border-amber-500/30 pb-3">
-                <p class="text-xs text-amber-400 font-cinzel">OFFICIAL DOCUMENT</p>
-                <h3 class="text-lg font-bold text-amber-100">마탑 공식 양식 기록서</h3>
-            </div>
-            
-            <div id="formatted-result" class="text-xs leading-relaxed font-mono whitespace-pre-wrap bg-black/50 p-4 rounded border border-amber-500/20 text-amber-200/90">
-                <!-- Script inserts output here -->
+        <!-- Form Steps Container -->
+        <div id="form-steps" class="hidden space-y-8">
+
+            <!-- Step 1: Identity -->
+            <section id="step-1" class="tower-card rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                    <span class="font-cinzel text-amber-400 font-bold text-lg">01.</span>
+                    <h2 class="text-sm font-semibold text-amber-200">신원 입력 (마탑 명부 기록)</h2>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">성별</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="setGender('男')" class="btn-gender p-2.5 rounded tower-input text-center">男 (남성)</button>
+                            <button type="button" onclick="setGender('女')" class="btn-gender p-2.5 rounded tower-input text-center">女 (여성)</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">이름</label>
+                        <input type="text" id="input-name" onchange="processName()" placeholder="이름을 입력하세요" class="w-full p-3 rounded-lg tower-input text-sm">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Physical -->
+            <section id="step-2" class="tower-card rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                    <span class="font-cinzel text-amber-400 font-bold text-lg">02.</span>
+                    <h2 class="text-sm font-semibold text-amber-200">신체 정보 입력 (신원 조사)</h2>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">키 (cm)</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="input-height" placeholder="175" class="w-full p-3 pr-10 rounded-lg tower-input text-sm">
+                            <span class="absolute right-3 text-amber-400/60 font-semibold">cm</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">대략적인 체격</label>
+                        <input type="text" id="input-build" placeholder="예: 슬림한, 마른 체구, 큰 체격" class="w-full p-3 rounded-lg tower-input text-sm">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Appearance -->
+            <section id="step-3" class="tower-card rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                    <span class="font-cinzel text-amber-400 font-bold text-lg">03.</span>
+                    <h2 class="text-sm font-semibold text-amber-200">기념 사진 촬영 (수정구 기록)</h2>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">눈 색</label>
+                        <input type="text" id="input-eye" placeholder="예: 호박색, 푸른빛, 검은색" class="w-full p-3 rounded-lg tower-input text-sm">
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">머리색</label>
+                        <input type="text" id="input-hair" placeholder="예: 붉은 머리, 금발, 흑발" class="w-full p-3 rounded-lg tower-input text-sm">
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-amber-300/70">외관적 특이사항 (선택)</label>
+                        <input type="text" id="input-feature" onblur="processAppearance()" placeholder="예: 왼쪽 눈가의 흉터, 문신" class="w-full p-3 rounded-lg tower-input text-sm">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Steps for Regular Procedure ONLY -->
+            <div id="regular-steps" class="space-y-8 hidden">
+
+                <!-- Step 4: Resonance -->
+                <section id="step-4" class="tower-card rounded-xl p-6 space-y-4">
+                    <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                        <span class="font-cinzel text-amber-400 font-bold text-lg">04.</span>
+                        <h2 class="text-sm font-semibold text-amber-200">수정구 공명 (마력 측정 전)</h2>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block mb-1 text-amber-300/70">나이</label>
+                                <input type="text" id="input-age" placeholder="예: 24세" class="w-full p-3 rounded-lg tower-input text-sm">
+                            </div>
+                            <div>
+                                <label class="block mb-1 text-amber-300/70">생일 (월.일)</label>
+                                <input type="text" id="input-birth" placeholder="예: 04.13" class="w-full p-3 rounded-lg tower-input text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 5: Mana Measurement -->
+                <section id="step-5" class="tower-card rounded-xl p-6 space-y-4">
+                    <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                        <span class="font-cinzel text-amber-400 font-bold text-lg">05.</span>
+                        <h2 class="text-sm font-semibold text-amber-200">이용자 마력 측정</h2>
+                    </div>
+                    <div class="space-y-2 text-xs">
+                        <button type="button" onclick="setMana('none')" class="btn-mana w-full p-3 rounded tower-input text-left flex justify-between items-center">
+                            <span>측정구 미반응</span>
+                            <span class="text-[10px] text-amber-400/60">마력 없음 / 측정 불가</span>
+                        </button>
+                        <div id="sub-mana-none" class="hidden pl-4 pr-1 py-1 space-y-1">
+                            <button type="button" onclick="setManaDetail('마력 없음')" class="btn-mana-sub w-full p-2 rounded border border-amber-500/20 text-left">마력이 없음</button>
+                            <button type="button" onclick="setManaDetail('측정 불가')" class="btn-mana-sub w-full p-2 rounded border border-amber-500/20 text-left">측정되지 않을 정도로 강력함</button>
+                        </div>
+
+                        <button type="button" onclick="setMana('faint')" class="btn-mana w-full p-3 rounded tower-input text-left flex justify-between items-center">
+                            <span>측정구가 옅게 공명한다</span>
+                            <span class="text-[10px] text-amber-400/60">1~4 서클 무작위</span>
+                        </button>
+
+                        <button type="button" onclick="setMana('bright')" class="btn-mana w-full p-3 rounded tower-input text-left flex justify-between items-center">
+                            <span>측정구가 환하게 공명한다</span>
+                            <span class="text-[10px] text-amber-400/60">5~9 서클 무작위</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Step 6: Affiliation -->
+                <section id="step-6" class="tower-card rounded-xl p-6 space-y-4">
+                    <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                        <span class="font-cinzel text-amber-400 font-bold text-lg">06.</span>
+                        <h2 class="text-sm font-semibold text-amber-200">소속 확인</h2>
+                    </div>
+                    <div class="space-y-3 text-xs">
+                        <!-- Visitor option -->
+                        <button type="button" id="btn-aff-visitor" onclick="setAffiliation('visitor')" class="btn-aff w-full p-3 rounded tower-input text-left flex justify-between items-center">
+                            <span>마탑 방문자</span>
+                            <span id="recom-visitor" class="hidden text-[10px] text-emerald-400">[추천]</span>
+                        </button>
+                        
+                        <div id="sub-visitor" class="hidden p-3 rounded bg-amber-950/20 border border-amber-500/20 space-y-2">
+                            <label class="block text-amber-300/70">방문 목적 서술 (직업, 재력 수준 등)</label>
+                            <input type="text" id="input-visit-reason" placeholder="예: 상단 거래 목적의 약초상, 넉넉한 재력" class="w-full p-2.5 rounded tower-input text-xs">
+                            <p class="text-[10px] text-amber-200/40">* 신분 정보는 추후 국적 절차에서 입력할 수 있습니다.</p>
+                        </div>
+
+                        <!-- Member option -->
+                        <button type="button" onclick="setAffiliation('member')" class="btn-aff w-full p-3 rounded tower-input text-left flex justify-between items-center">
+                            <span>마탑 소속</span>
+                        </button>
+
+                        <div id="sub-member" class="hidden p-3 rounded bg-amber-950/20 border border-amber-500/20 space-y-3">
+                            <div>
+                                <label class="block mb-1 text-amber-300/70">주 부서 선택</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" id="btn-dept-combat" onclick="setMainDept('전투마법부')" class="p-2.5 rounded border border-amber-500/30 text-center flex flex-col items-center">
+                                        <span>전투마법부</span>
+                                        <span id="recom-combat" class="hidden text-[9px] text-emerald-400">[추천]</span>
+                                    </button>
+                                    <button type="button" id="btn-dept-research" onclick="setMainDept('연구지원부')" class="p-2.5 rounded border border-amber-500/30 text-center flex flex-col items-center">
+                                        <span>연구지원부</span>
+                                        <span id="recom-research" class="hidden text-[9px] text-emerald-400">[추천]</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="sub-dept-options" class="hidden">
+                                <label class="block mb-1 text-amber-300/70">세부 소부서 선택</label>
+                                <div id="sub-dept-combat-list" class="grid grid-cols-3 gap-1 hidden">
+                                    <button type="button" onclick="setSubDept('마법진개량부')" class="btn-subdept p-2 rounded border border-amber-500/20 text-[11px]">마법진개량부</button>
+                                    <button type="button" onclick="setSubDept('마도구제작부')" class="btn-subdept p-2 rounded border border-amber-500/20 text-[11px]">마도구제작부</button>
+                                    <button type="button" onclick="setSubDept('후방지원부')" class="btn-subdept p-2 rounded border border-amber-500/20 text-[11px]">후방지원부</button>
+                                </div>
+                                <div id="sub-dept-research-list" class="grid grid-cols-3 gap-1 hidden">
+                                    <button type="button" onclick="setSubDept('포션계량부')" class="btn-subdept p-2 rounded border border-amber-500/20 text-[11px]">포션계량부</button>
+                                    <button type="button" onclick="setSubDept('학술연구부')" class="btn-subdept p-2 rounded border border-amber-500/20 text-[11px]">학술연구부</button>
+                                    <button type="button" id="btn-sub-admin" onclick="setSubDept('내정지원부')" class="btn-subdept p-2 rounded border border-amber-500/20 text-[11px] flex flex-col items-center">
+                                        <span>내정지원부</span>
+                                        <span id="recom-admin" class="hidden text-[8px] text-emerald-400">[추천]</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 7: Character Relationship Dialogs -->
+                <section id="step-7" class="tower-card rounded-xl p-6 space-y-4">
+                    <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                        <span class="font-cinzel text-amber-400 font-bold text-lg">07.</span>
+                        <h2 class="text-sm font-semibold text-amber-200">인물 관계 확인 (사담)</h2>
+                    </div>
+
+                    <div id="char-dialog-container" class="space-y-4 text-xs">
+                        <div class="bg-black/40 p-4 rounded-lg border border-amber-500/20 space-y-3">
+                            <p id="char-question" class="text-sm font-semibold text-amber-100 text-center"></p>
+                            
+                            <div id="char-know-btns" class="grid grid-cols-2 gap-2">
+                                <button onclick="answerCharKnow(true)" class="p-3 rounded btn-gold text-xs">알아요</button>
+                                <button onclick="answerCharKnow(false)" class="p-3 rounded border border-amber-500/30 tower-input text-xs">몰라요</button>
+                            </div>
+
+                            <div id="char-relation-box" class="space-y-3 hidden">
+                                <p class="text-[11px] text-amber-300/70 text-center"><span id="char-target-name"></span>이(가) 당신을 어떻게 생각하나요?</p>
+                                <div class="grid grid-cols-3 gap-1.5 text-xs">
+                                    <button onclick="selectAffection('🖤 애증')" class="btn-affec p-2 rounded border border-amber-500/30">🖤 애증</button>
+                                    <button onclick="selectAffection('🤎 혐오')" class="btn-affec p-2 rounded border border-amber-500/30">🤎 혐오</button>
+                                    <button onclick="selectAffection('🩶 어색')" class="btn-affec p-2 rounded border border-amber-500/30">🩶 어색</button>
+                                    <button onclick="selectAffection('💛 우정')" class="btn-affec p-2 rounded border border-amber-500/30">💛 우정</button>
+                                    <button onclick="selectAffection('❤️ 호감')" class="btn-affec p-2 rounded border border-amber-500/30">❤️ 호감</button>
+                                    <button onclick="selectAffection('🩷 사랑')" class="btn-affec p-2 rounded border border-amber-500/30">🩷 사랑</button>
+                                </div>
+                                <div id="char-nickname-box" class="space-y-2 hidden">
+                                    <label class="block text-amber-300/70">해당 캐릭터가 당신을 부르는 호칭</label>
+                                    <input type="text" id="input-nickname" placeholder="예: 체론, 너, 체로온" class="w-full p-2.5 rounded tower-input text-xs">
+                                    <button onclick="confirmCharRelation()" class="w-full py-2.5 rounded btn-gold text-xs">확인 및 다음</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <button onclick="copyToClipboard()" class="w-full py-3 bg-amber-500/20 border border-amber-400/40 text-amber-200 text-xs rounded font-semibold active:bg-amber-500/40">
-                기록서 복사하기
-            </button>
-        </section>
+            <!-- Step 8: Nation & Status Selection -->
+            <section id="step-8" class="tower-card rounded-xl p-6 space-y-4">
+                <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
+                    <span class="font-cinzel text-amber-400 font-bold text-lg">08.</span>
+                    <h2 class="text-sm font-semibold text-amber-200">출신 국가 및 신분 확정</h2>
+                </div>
+                
+                <div class="space-y-3 text-xs">
+                    <p class="text-amber-200/80">마탑 허가증에 기록될 출신 국가를 선택하세요.</p>
+                    
+                    <div id="nation-list" class="space-y-2">
+                        <!-- Dynamic Nation Buttons -->
+                    </div>
+
+                    <div id="family-status-box" class="hidden pt-4 border-t border-amber-500/20 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-amber-300">신분 / 가문 정보</label>
+                            <button onclick="randomizeStatus()" class="px-2.5 py-1 bg-amber-500/20 border border-amber-400/40 rounded text-[10px] text-amber-300">🎲 랜덤 작성</button>
+                        </div>
+                        <input type="text" id="input-family" placeholder="예: 명문 무가인 데로트 백작가의 삼남" class="w-full p-3 rounded-lg tower-input text-sm">
+                        
+                        <button onclick="generateFinalOutput()" class="w-full py-4 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-black font-bold rounded-lg shadow-lg font-cinzel text-sm tracking-wider">
+                            최종 프로필 생성
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Output Section -->
+            <section id="sec-output" class="tower-card rounded-xl p-6 space-y-4 border-amber-400/60 hidden">
+                <div class="text-center border-b border-amber-500/30 pb-3">
+                    <p class="text-xs text-amber-400 font-cinzel">FINAL DOCUMENT</p>
+                    <h3 class="text-base font-bold text-amber-100">발급된 마탑 프로필</h3>
+                </div>
+
+                <div class="relative">
+                    <textarea id="output-text" rows="10" oninput="updateCharCount()" class="w-full p-4 rounded-lg bg-black/80 border border-amber-500/30 text-amber-100 text-xs leading-relaxed font-mono resize-none"></textarea>
+                    <div id="char-count" class="text-right text-[11px] mt-1 text-amber-300/70 font-mono">0 / 1500자</div>
+                </div>
+
+                <button onclick="copyResult()" class="w-full py-3.5 btn-gold rounded-lg text-xs tracking-wider">
+                    📋 프로필 복사하기
+                </button>
+            </section>
+
+        </div>
 
     </main>
 
     <script>
-        let selectedUrgency = '통상';
+        // Data & State
+        let selectedMode = ''; // '약식' or '정규'
+        let gender = '男';
+        let nationScores = { '로그넘': 0, '라이덴바흐': 0, '데노먼드': 0, '그로셴하이츠': 0, '아델린': 0 };
+        
+        let manaType = '';
+        let manaCircle = '';
+        let affiliationType = ''; // 'visitor' or 'member'
+        let mainDept = '';
+        let subDept = '';
 
-        function setUrgency(val) {
-            selectedUrgency = val;
-            document.querySelectorAll('.urgency-btn').forEach(btn => {
-                if(btn.innerText.includes(val)) {
-                    btn.classList.add('bg-amber-500/30', 'border-amber-400');
-                } else {
-                    btn.classList.remove('bg-amber-500/30', 'border-amber-400');
-                }
-            });
-        }
+        // Character Dialogs Tracker
+        const chars = [
+            { key: '제논', title: '마탑주', isKnow: false, affec: '', nickname: '' },
+            { key: '레비넌', title: '부탑주', isKnow: false, affec: '', nickname: '' },
+            { key: '체론', title: '유망주', isKnow: false, affec: '', nickname: '' },
+            { key: '비첼', title: '그 애', isKnow: false, affec: '', nickname: '' }
+        ];
+        let currentCharIdx = 0;
+        let selectedNation = '';
 
-        // Scroll Background & Progress Effect
+        const nationInfo = {
+            '로그넘': '대륙 중앙 반도 지형의 왕정 국가. 해상 무역 거점지이자 중립국.',
+            '라이덴바흐': '서대륙 정복 제국. 유일신교 고도 발달.',
+            '데노먼드': '서대륙 변방 샤머니즘 왕국. 이종 및 잡종 우호국.',
+            '그로셴하이츠': '동대륙 용 전설 황국. 강력한 모계 사회 및 명문 마탑.',
+            '아델린': '동대륙 휴양 섬 왕국. 왕실 내전 심각.'
+        };
+
+        // Scroll Background & UI interactions
         window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = scrollTop / docHeight;
-
-            // Progress Bar
-            document.getElementById('progress-bar').style.width = (scrollPercent * 100) + '%';
-
-            // Parallax Background Transition
-            const forestBg = document.getElementById('bg-forest');
-            const towerBg = document.getElementById('bg-tower');
-            const sanctumBg = document.getElementById('bg-sanctum');
+            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            const forest = document.getElementById('bg-forest');
+            const tower = document.getElementById('bg-tower');
+            const sanctum = document.getElementById('bg-sanctum');
 
             if (scrollPercent < 0.35) {
-                forestBg.style.opacity = '1';
-                towerBg.style.opacity = '0';
-                sanctumBg.style.opacity = '0';
-            } else if (scrollPercent >= 0.35 && scrollPercent < 0.7) {
-                forestBg.style.opacity = '0';
-                towerBg.style.opacity = '1';
-                sanctumBg.style.opacity = '0';
+                forest.style.opacity = '1'; tower.style.opacity = '0'; sanctum.style.opacity = '0';
+            } else if (scrollPercent < 0.7) {
+                forest.style.opacity = '0'; tower.style.opacity = '1'; sanctum.style.opacity = '0';
             } else {
-                forestBg.style.opacity = '0';
-                towerBg.style.opacity = '0';
-                sanctumBg.style.opacity = '1';
+                forest.style.opacity = '0'; tower.style.opacity = '0'; sanctum.style.opacity = '1';
             }
         });
 
-        // Form Transformation Logic
-        function generateScroll() {
-            const sender = document.getElementById('sender').value || '익명의 기록자';
-            const dept = document.getElementById('department').value;
-            const subject = document.getElementById('subject').value || '무제';
-            const content = document.getElementById('content').value || '내용 없음';
-            const today = new Date().toISOString().split('T')[0];
-
-            const formattedText = `[마탑 공식 양식서 - 제 ${Math.floor(Math.random() * 8999 + 1000)}호]
-────────────────────────
-■ 발 신 자 : ${sender}
-■ 수신부서 : ${dept}
-■ 작성일자 : ${today}
-■ 긴급등급 : [${selectedUrgency}]
-────────────────────────
-■ 안 건 명 : ${subject}
-
-■ 상세 내용 :
-${content}
-
-────────────────────────
-위 기록은 외딴 숲 마탑의 인장에 의해 정식 양식으로 인가되었습니다.`;
-
-            document.getElementById('formatted-result').innerText = formattedText;
-            const resultSec = document.getElementById('result-section');
-            resultSec.classList.remove('hidden');
-            resultSec.scrollIntoView({ behavior: 'smooth' });
+        function showModal(text) {
+            document.getElementById('modal-text').innerText = text;
+            document.getElementById('dialog-modal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('dialog-modal').classList.add('hidden');
         }
 
-        function copyToClipboard() {
-            const text = document.getElementById('formatted-result').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('마탑 기록서가 클립보드에 복사되었습니다.');
+        // Mode Selection
+        function selectMode(mode) {
+            selectedMode = mode;
+            document.getElementById('sec-mode').classList.add('hidden');
+            document.getElementById('form-steps').classList.remove('hidden');
+
+            if (mode === '정규') {
+                document.getElementById('regular-steps').classList.remove('hidden');
+                initCharDialog();
+            }
+            renderNations();
+        }
+
+        function setGender(g) {
+            gender = g;
+            document.querySelectorAll('.btn-gender').forEach(btn => {
+                btn.classList.toggle('bg-amber-500/30', btn.innerText.includes(g));
+            });
+        }
+
+        // Name Estimation
+        function processName() {
+            const name = document.getElementById('input-name').value.trim();
+            if (!name || selectedMode === '약식') return;
+
+            // Simple heuristic language style check
+            let matched = '';
+            if (/[가-힣]/.test(name)) {
+                // Check simple character patterns
+                if (/[가-하]/.test(name)) matched = '데노먼드';
+            }
+            
+            // Default random fallback for mock heuristic
+            const styles = ['데노먼드', '그로셴하이츠', '라이덴바흐', '로그넘', '아델린'];
+            const chosen = matched || styles[Math.floor(Math.random() * styles.length)];
+            
+            nationScores[chosen] += 2;
+            showModal(`${chosen} 출신이신가봐요~`);
+        }
+
+        // Appearance Estimation
+        function processAppearance() {
+            const eye = document.getElementById('input-eye').value;
+            const hair = document.getElementById('input-hair').value;
+            if (selectedMode === '약식' || (!eye && !hair)) return;
+
+            let candidate = [];
+            if (eye.includes('녹') || hair.includes('갈')) candidate.push('로그넘');
+            if (eye.includes('푸') || hair.includes('밝') || hair.includes('금')) candidate.push('라이덴바흐');
+            if (eye.includes('어두') || eye.includes('검') || hair.includes('적') || hair.includes('붉')) candidate.push('데노먼드');
+            if (eye.includes('붉') || hair.includes('금')) candidate.push('그로셴하이츠');
+            if (eye.includes('밝') || hair.includes('어두') || hair.includes('흑')) candidate.push('아델린');
+
+            const chosen = candidate.length > 0 ? candidate[Math.floor(Math.random() * candidate.length)] : '로그넘';
+            nationScores[chosen] += 2;
+            showModal(`${chosen} 분들이랑 닮았네요~`);
+        }
+
+        // Mana Logic
+        function setMana(type) {
+            manaType = type;
+            document.getElementById('sub-mana-none').classList.toggle('hidden', type !== 'none');
+
+            if (type === 'faint') {
+                manaCircle = `${Math.floor(Math.random() * 4) + 1}서클`;
+                applyManaScore(['로그넘', '라이덴바흐', '그로셴하이츠']);
+            } else if (type === 'bright') {
+                manaCircle = `${Math.floor(Math.random() * 5) + 5}서클`;
+                applyManaScore(['그로셴하이츠', '아델린']);
+            }
+            updateAffiliationRecommendations();
+        }
+
+        function setManaDetail(detail) {
+            manaCircle = detail;
+            if (detail === '마력이 없음') nationScores['로그넘'] += 1;
+            applyManaScore(['데노먼드']);
+        }
+
+        function applyManaScore(nations) {
+            nations.forEach(n => nationScores[n] += 1);
+            const chosen = nations[Math.floor(Math.random() * nations.length)];
+            showModal(`${chosen} 분들이 보통 그렇죠~`);
+        }
+
+        // Affiliation Logic
+        function updateAffiliationRecommendations() {
+            const recomVisitor = document.getElementById('recom-visitor');
+            const recomCombat = document.getElementById('recom-combat');
+            const recomResearch = document.getElementById('recom-research');
+            const recomAdmin = document.getElementById('recom-admin');
+
+            recomVisitor.classList.toggle('hidden', manaCircle !== '마력이 없음');
+            recomCombat.classList.toggle('hidden', manaType !== 'bright');
+            recomResearch.classList.toggle('hidden', !manaType);
+            recomAdmin.classList.toggle('hidden', manaCircle !== '마력이 없음');
+        }
+
+        function setAffiliation(type) {
+            affiliationType = type;
+            document.getElementById('sub-visitor').classList.toggle('hidden', type !== 'visitor');
+            document.getElementById('sub-member').classList.toggle('hidden', type !== 'member');
+
+            if (type === 'visitor') {
+                const chosen = ['로그넘', '라이덴바흐', '데노먼드'][Math.floor(Math.random() * 3)];
+                nationScores[chosen] += 1;
+                showModal(`${chosen} 분들은 소속이 다들 비슷하거든요~`);
+            }
+        }
+
+        function setMainDept(dept) {
+            mainDept = dept;
+            document.getElementById('sub-dept-options').classList.remove('hidden');
+            document.getElementById('sub-dept-combat-list').classList.toggle('hidden', dept !== '전투마법부');
+            document.getElementById('sub-dept-research-list').classList.toggle('hidden', dept !== '연구지원부');
+        }
+
+        function setSubDept(sub) {
+            subDept = sub;
+            let targetNations = [];
+            if (sub === '학술연구부') targetNations = ['로그넘', '데노먼드'];
+            else if (sub === '포션계량부' || sub === '내정지원부') targetNations = ['그로셴하이츠'];
+            else if (sub === '마도구제작부' || sub === '후방지원부') targetNations = ['아델린'];
+            else targetNations = ['데노먼드'];
+
+            const chosen = targetNations[Math.floor(Math.random() * targetNations.length)];
+            nationScores[chosen] += 1;
+            showModal(`${chosen} 분들은 소속이 다들 비슷하거든요~`);
+        }
+
+        // Character Dialog Logic
+        function initCharDialog() {
+            showCharQuestion();
+        }
+
+        function showCharQuestion() {
+            const c = chars[currentCharIdx];
+            const qText = (c.key === '제논' || c.key === '레비넌') 
+                ? `${c.title}(${c.key})랑 아는사이세요?`
+                : `${c.title}(${c.key})를 알아요?`;
+            
+            document.getElementById('char-question').innerText = qText;
+            document.getElementById('char-know-btns').classList.remove('hidden');
+            document.getElementById('char-relation-box').classList.add('hidden');
+            document.getElementById('char-nickname-box').classList.add('hidden');
+        }
+
+        function answerCharKnow(know) {
+            const c = chars[currentCharIdx];
+            c.isKnow = know;
+
+            if (!know) {
+                nextCharDialog();
+            } else {
+                document.getElementById('char-know-btns').classList.add('hidden');
+                document.getElementById('char-target-name').innerText = c.key;
+                document.getElementById('char-relation-box').classList.remove('hidden');
+            }
+        }
+
+        function selectAffection(affec) {
+            const c = chars[currentCharIdx];
+            c.affec = affec;
+            document.getElementById('char-nickname-box').classList.remove('hidden');
+        }
+
+        function confirmCharRelation() {
+            const c = chars[currentCharIdx];
+            c.nickname = document.getElementById('input-nickname').value || c.key;
+            document.getElementById('input-nickname').value = '';
+
+            // Apply Nation Heuristics for Relationships
+            if (c.key === '비첼' && c.affec) nationScores['로그넘'] += 1;
+            if (c.key === '제논' && c.isKnow) nationScores['그로셴하이츠'] += 1;
+            if (c.key === '체론' && c.isKnow) nationScores['아델린'] += 1;
+
+            nextCharDialog();
+        }
+
+        function nextCharDialog() {
+            currentCharIdx++;
+            if (currentCharIdx < chars.length) {
+                showCharQuestion();
+            } else {
+                document.getElementById('char-dialog-container').innerHTML = `
+                    <div class="text-center py-4 text-emerald-400 font-semibold">
+                        음~ 그렇구나. 인물 관계 확인이 마무리되었습니다!
+                    </div>
+                `;
+            }
+        }
+
+        // Render Nation Selection & Score Recommendation
+        function renderNations() {
+            const list = document.getElementById('nation-list');
+            list.innerHTML = '';
+
+            // Calculate max score
+            let maxScore = -1;
+            Object.values(nationScores).forEach(s => { if (s > maxScore) maxScore = s; });
+
+            Object.keys(nationInfo).forEach(nat => {
+                const isRecom = selectedMode === '정규' && nationScores[nat] === maxScore && maxScore > 0;
+                
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-3 rounded-lg border border-amber-500/30 text-left bg-black/40 hover:border-amber-400 transition flex justify-between items-start';
+                btn.onclick = () => selectNation(nat);
+                btn.innerHTML = `
+                    <div>
+                        <div class="font-bold text-amber-200 text-xs">
+                            ${nat} ${isRecom ? '<span class="text-emerald-400 text-[10px] ml-1">[추천]</span>' : ''}
+                        </div>
+                        <div class="text-[10px] text-amber-200/50 mt-0.5">${nationInfo[nat]}</div>
+                    </div>
+                `;
+                list.appendChild(btn);
+            });
+        }
+
+        function selectNation(nat) {
+            selectedNation = nat;
+            document.getElementById('family-status-box').classList.remove('hidden');
+            showModal(`[${nat}]을(를) 출신 국가로 선택하셨습니다.`);
+        }
+
+        function randomizeStatus() {
+            const infos = ['사교계에 큰 영향을 끼치는', '대대로 상단을 운영중인', '내로라하는 무武가家', '유서와 전통이 깊은', '이름만 귀족인', '소박한'];
+            const ranks = [(selectedNation === '그로셴하이츠' ? '황실' : '왕실') + ' 방계', '공작가', '백작가', '자작가', '남작가'];
+            
+            const info = infos[Math.floor(Math.random() * infos.length)];
+            const rank = ranks[Math.floor(Math.random() * ranks.length)];
+            
+            document.getElementById('input-family').value = `${info} ${selectedNation} ${rank}`;
+        }
+
+        // Final Profile Output Generation
+        function generateFinalOutput() {
+            const name = document.getElementById('input-name').value || '익명';
+            const height = document.getElementById('input-height').value || '170';
+            const build = document.getElementById('input-build').value || '보통 체격';
+            const eye = document.getElementById('input-eye').value || '검은 눈';
+            const hair = document.getElementById('input-hair').value || '흑발';
+            const feature = document.getElementById('input-feature').value;
+            const family = document.getElementById('input-family').value || '소박한 가문';
+
+            let appearanceStr = `${height}cm + ${build} + ${hair} + ${eye}`;
+            if (feature) appearanceStr += ` + ${feature}`;
+
+            let output = `### ${name}\n`;
+            output += `- 이름: ${name}\n`;
+            output += `- 성별: ${gender}\n`;
+
+            if (selectedMode === '정규') {
+                const birth = document.getElementById('input-birth').value || '01.01';
+                output += `- 출생: 888.${birth}, ${selectedNation}\n`;
+                output += `- 외모: ${appearanceStr}\n`;
+
+                // Relationships formatting
+                let relList = [];
+                chars.forEach(c => {
+                    if (c.isKnow && c.affec) {
+                        relList.push(`${c.key}${c.affec.split(' ')[0]}(${c.nickname})`);
+                    }
+                });
+                output += `- 타 캐릭터가 ${name}을(를) 대하는 감정(호칭): ${relList.length > 0 ? relList.join(', ') : '없음'}\n`;
+
+                // Misc Formatting
+                let extra = `(신분): ${family}`;
+                if (affiliationType === 'visitor') {
+                    const reason = document.getElementById('input-visit-reason').value || '방문';
+                    extra += ` / 마탑 방문자 (${reason})`;
+                } else if (affiliationType === 'member') {
+                    const circleStr = (manaCircle === '마력이 없음') ? '이론부' : manaCircle;
+                    extra += ` / 마탑 소속 (${mainDept} - ${subDept} - ${circleStr})`;
+                }
+                output += `- 기타${extra}`;
+
+            } else {
+                // Short Procedure
+                output += `- 출생: ${selectedNation}\n`;
+                output += `- 외모: ${appearanceStr}\n`;
+                output += `- 타 캐릭터가 ${name}을(를) 대하는 감정(호칭): 없음\n`;
+                output += `- 기타(신분): ${family}`;
+            }
+
+            const sec = document.getElementById('sec-output');
+            const txtArea = document.getElementById('output-text');
+            sec.classList.remove('hidden');
+            txtArea.value = output;
+            updateCharCount();
+            sec.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateCharCount() {
+            const txtArea = document.getElementById('output-text');
+            const countDiv = document.getElementById('char-count');
+            const len = txtArea.value.length;
+            const maxLen = selectedMode === '약식' ? 500 : 1500;
+            const threshold = selectedMode === '약식' ? 500 : 1000;
+
+            countDiv.innerText = `${len} / ${maxLen}자`;
+
+            if (len >= threshold) {
+                txtArea.style.borderColor = '#f97316';
+                txtArea.style.backgroundColor = 'rgba(124, 45, 18, 0.3)';
+            } else {
+                txtArea.style.borderColor = 'rgba(184, 153, 90, 0.3)';
+                txtArea.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            }
+        }
+
+        function copyResult() {
+            const txtArea = document.getElementById('output-text');
+            navigator.clipboard.writeText(txtArea.value).then(() => {
+                showModal('클립보드에 복사되었습니다!\n유저노트에 작성해 주세요.');
             });
         }
     </script>
