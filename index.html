@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>마탑 출입 허가서 발급 시스템</title>
+    <title>마탑 입산 허가서 발급 시스템</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -58,7 +59,6 @@
             backdrop-filter: blur(6px);
         }
 
-        /* custom scrollbar for output */
         textarea::-webkit-scrollbar {
             width: 6px;
         }
@@ -212,7 +212,7 @@
                             <span class="text-[10px] text-amber-400/60">마력 없음 / 측정 불가</span>
                         </button>
                         <div id="sub-mana-none" class="hidden pl-4 pr-1 py-1 space-y-1">
-                            <button type="button" onclick="setManaDetail('마력 없음')" class="btn-mana-sub w-full p-2 rounded border border-amber-500/20 text-left">마력이 없음</button>
+                            <button type="button" onclick="setManaDetail('마력이 없음')" class="btn-mana-sub w-full p-2 rounded border border-amber-500/20 text-left">마력이 없음</button>
                             <button type="button" onclick="setManaDetail('측정 불가')" class="btn-mana-sub w-full p-2 rounded border border-amber-500/20 text-left">측정되지 않을 정도로 강력함</button>
                         </div>
 
@@ -235,7 +235,6 @@
                         <h2 class="text-sm font-semibold text-amber-200">소속 확인</h2>
                     </div>
                     <div class="space-y-3 text-xs">
-                        <!-- Visitor option -->
                         <button type="button" id="btn-aff-visitor" onclick="setAffiliation('visitor')" class="btn-aff w-full p-3 rounded tower-input text-left flex justify-between items-center">
                             <span>마탑 방문자</span>
                             <span id="recom-visitor" class="hidden text-[10px] text-emerald-400">[추천]</span>
@@ -247,7 +246,6 @@
                             <p class="text-[10px] text-amber-200/40">* 신분 정보는 추후 국적 절차에서 입력할 수 있습니다.</p>
                         </div>
 
-                        <!-- Member option -->
                         <button type="button" onclick="setAffiliation('member')" class="btn-aff w-full p-3 rounded tower-input text-left flex justify-between items-center">
                             <span>마탑 소속</span>
                         </button>
@@ -287,7 +285,7 @@
                     </div>
                 </section>
 
-                <!-- Step 7: Character Relationship Dialogs -->
+                <!-- Step 7: Character Relationship Dialogs (Image & Profile Updated) -->
                 <section id="step-7" class="tower-card rounded-xl p-6 space-y-4">
                     <div class="flex items-center gap-2 border-b border-amber-500/20 pb-3">
                         <span class="font-cinzel text-amber-400 font-bold text-lg">07.</span>
@@ -295,14 +293,38 @@
                     </div>
 
                     <div id="char-dialog-container" class="space-y-4 text-xs">
-                        <div class="bg-black/40 p-4 rounded-lg border border-amber-500/20 space-y-3">
-                            <p id="char-question" class="text-sm font-semibold text-amber-100 text-center"></p>
+                        <div class="bg-black/40 p-4 rounded-lg border border-amber-500/20 space-y-4">
                             
+                            <!-- Detailed Character Profile Card -->
+                            <div class="flex gap-3 items-start bg-amber-950/20 p-3 rounded-lg border border-amber-500/20">
+                                <div class="w-20 h-28 flex-shrink-0 bg-black/60 rounded border border-amber-500/30 overflow-hidden flex items-center justify-center">
+                                    <img id="char-img" src="" alt="캐릭터 일러스트" class="w-full h-full object-cover hidden" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                                    <span class="text-[10px] text-amber-400/50 p-1 text-center">이미지 준비중</span>
+                                </div>
+                                <div class="space-y-1.5 flex-1 min-w-0">
+                                    <div class="flex items-center justify-between border-b border-amber-500/20 pb-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span id="char-title-tag" class="text-[10px] px-1.5 py-0.5 bg-amber-500/20 text-amber-300 rounded font-semibold"></span>
+                                            <h3 id="char-name-tag" class="text-sm font-bold text-amber-100 truncate"></h3>
+                                        </div>
+                                        <span id="char-birth-tag" class="text-[10px] text-amber-400/80 font-mono"></span>
+                                    </div>
+                                    <div id="char-body-tag" class="text-[10px] text-amber-300/80 font-medium"></div>
+                                    <div id="char-dept-tag" class="text-[10px] text-amber-400/90 font-semibold"></div>
+                                    <p id="char-desc-tag" class="text-[11px] text-amber-200/70 leading-snug break-keep"></p>
+                                </div>
+                            </div>
+
+                            <!-- Question Box -->
+                            <p id="char-question" class="text-sm font-semibold text-amber-100 text-center py-1"></p>
+                            
+                            <!-- Know/Don't Know Buttons -->
                             <div id="char-know-btns" class="grid grid-cols-2 gap-2">
                                 <button onclick="answerCharKnow(true)" class="p-3 rounded btn-gold text-xs">알아요</button>
                                 <button onclick="answerCharKnow(false)" class="p-3 rounded border border-amber-500/30 tower-input text-xs">몰라요</button>
                             </div>
 
+                            <!-- Relation Details Box -->
                             <div id="char-relation-box" class="space-y-3 hidden">
                                 <p class="text-[11px] text-amber-300/70 text-center"><span id="char-target-name"></span>이(가) 당신을 어떻게 생각하나요?</p>
                                 <div class="grid grid-cols-3 gap-1.5 text-xs">
@@ -334,9 +356,7 @@
                 <div class="space-y-3 text-xs">
                     <p class="text-amber-200/80">마탑 허가증에 기록될 출신 국가를 선택하세요.</p>
                     
-                    <div id="nation-list" class="space-y-2">
-                        <!-- Dynamic Nation Buttons -->
-                    </div>
+                    <div id="nation-list" class="space-y-2"></div>
 
                     <div id="family-status-box" class="hidden pt-4 border-t border-amber-500/20 space-y-3">
                         <div class="flex justify-between items-center">
@@ -374,23 +394,70 @@
     </main>
 
     <script>
-        // Data & State
-        let selectedMode = ''; // '약식' or '정규'
+        let selectedMode = '';
         let gender = '男';
         let nationScores = { '로그넘': 0, '라이덴바흐': 0, '데노먼드': 0, '그로셴하이츠': 0, '아델린': 0 };
         
         let manaType = '';
         let manaCircle = '';
-        let affiliationType = ''; // 'visitor' or 'member'
+        let affiliationType = '';
         let mainDept = '';
         let subDept = '';
 
-        // Character Dialogs Tracker
+        // Detailed Profile Data Applied
         const chars = [
-            { key: '제논', title: '마탑주', isKnow: false, affec: '', nickname: '' },
-            { key: '레비넌', title: '부탑주', isKnow: false, affec: '', nickname: '' },
-            { key: '체론', title: '유망주', isKnow: false, affec: '', nickname: '' },
-            { key: '비첼', title: '그 애', isKnow: false, affec: '', nickname: '' }
+            { 
+                key: '제논', 
+                fullname: '제논 헤번트',
+                title: '마탑주', 
+                birth: '08.23',
+                body: '177cm + 단단하고 근육질',
+                dept: '전투마법부 총괄',
+                desc: '타고난 천재. 마력을 다루는 감각이 남달라 일은 레비넌에게 맡기는 편. 인간이 아니라는 소문이 돔.', 
+                image: 'zenon.PNG', 
+                isKnow: false, 
+                affec: '', 
+                nickname: '' 
+            },
+            { 
+                key: '레비넌', 
+                fullname: '레비넌 베뉴아',
+                title: '부탑주', 
+                birth: '02.10',
+                body: '187cm + 수려한 체형',
+                dept: '연구지원부 총괄',
+                desc: '노력을 멈추지 않는 우수한 학구파. 주기적으로 데노먼트 유적 순회. 아델린에 별장이 있음.', 
+                image: 'levinan.PNG', 
+                isKnow: false, 
+                affec: '', 
+                nickname: '' 
+            },
+            { 
+                key: '체론', 
+                fullname: '체론 데로트',
+                title: '유망주', 
+                birth: '04.13',
+                body: '184cm + 큰 체격',
+                dept: '연구지원부-내정지원부-7서클',
+                desc: '그로셴하이츠 명문 데로트 백작가 삼남. 수석 졸업 스카웃 영앤리치. 상업적 재능이 뛰어남.', 
+                image: 'cheron.PNG', 
+                isKnow: false, 
+                affec: '', 
+                nickname: '' 
+            },
+            { 
+                key: '비첼', 
+                fullname: '비첼 다즈민',
+                title: '그 애', 
+                birth: '06.08',
+                body: '182cm + 마른 근육 체형',
+                dept: '연구지원부-포션개량부',
+                desc: '이상할 정도로 강한 마력의 과출력으로 사고를 침… 마법진 계산 없는 마법약 위주 연구.', 
+                image: 'vichel.PNG', 
+                isKnow: false, 
+                affec: '', 
+                nickname: '' 
+            }
         ];
         let currentCharIdx = 0;
         let selectedNation = '';
@@ -403,7 +470,6 @@
             '아델린': '동대륙 휴양 섬 왕국. 왕실 내전 심각.'
         };
 
-        // Scroll Background & UI interactions
         window.addEventListener('scroll', () => {
             const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
             const forest = document.getElementById('bg-forest');
@@ -427,7 +493,6 @@
             document.getElementById('dialog-modal').classList.add('hidden');
         }
 
-        // Mode Selection
         function selectMode(mode) {
             selectedMode = mode;
             document.getElementById('sec-mode').classList.add('hidden');
@@ -447,19 +512,15 @@
             });
         }
 
-        // Name Estimation
         function processName() {
             const name = document.getElementById('input-name').value.trim();
             if (!name || selectedMode === '약식') return;
 
-            // Simple heuristic language style check
             let matched = '';
             if (/[가-힣]/.test(name)) {
-                // Check simple character patterns
                 if (/[가-하]/.test(name)) matched = '데노먼드';
             }
             
-            // Default random fallback for mock heuristic
             const styles = ['데노먼드', '그로셴하이츠', '라이덴바흐', '로그넘', '아델린'];
             const chosen = matched || styles[Math.floor(Math.random() * styles.length)];
             
@@ -467,7 +528,6 @@
             showModal(`${chosen} 출신이신가봐요~`);
         }
 
-        // Appearance Estimation
         function processAppearance() {
             const eye = document.getElementById('input-eye').value;
             const hair = document.getElementById('input-hair').value;
@@ -485,7 +545,6 @@
             showModal(`${chosen} 분들이랑 닮았네요~`);
         }
 
-        // Mana Logic
         function setMana(type) {
             manaType = type;
             document.getElementById('sub-mana-none').classList.toggle('hidden', type !== 'none');
@@ -512,7 +571,6 @@
             showModal(`${chosen} 분들이 보통 그렇죠~`);
         }
 
-        // Affiliation Logic
         function updateAffiliationRecommendations() {
             const recomVisitor = document.getElementById('recom-visitor');
             const recomCombat = document.getElementById('recom-combat');
@@ -564,6 +622,19 @@
 
         function showCharQuestion() {
             const c = chars[currentCharIdx];
+            
+            // Render Detailed Character Card Information
+            document.getElementById('char-title-tag').innerText = c.title;
+            document.getElementById('char-name-tag').innerText = c.fullname;
+            document.getElementById('char-birth-tag').innerText = `🎂 ${c.birth}`;
+            document.getElementById('char-body-tag').innerText = `📏 ${c.body}`;
+            document.getElementById('char-dept-tag').innerText = `🏛️ ${c.dept}`;
+            document.getElementById('char-desc-tag').innerText = c.desc;
+            
+            const imgEl = document.getElementById('char-img');
+            imgEl.src = c.image;
+            imgEl.classList.remove('hidden');
+
             const qText = (c.key === '제논' || c.key === '레비넌') 
                 ? `${c.title}(${c.key})랑 아는사이세요?`
                 : `${c.title}(${c.key})를 알아요?`;
@@ -598,7 +669,6 @@
             c.nickname = document.getElementById('input-nickname').value || c.key;
             document.getElementById('input-nickname').value = '';
 
-            // Apply Nation Heuristics for Relationships
             if (c.key === '비첼' && c.affec) nationScores['로그넘'] += 1;
             if (c.key === '제논' && c.isKnow) nationScores['그로셴하이츠'] += 1;
             if (c.key === '체론' && c.isKnow) nationScores['아델린'] += 1;
@@ -619,12 +689,10 @@
             }
         }
 
-        // Render Nation Selection & Score Recommendation
         function renderNations() {
             const list = document.getElementById('nation-list');
             list.innerHTML = '';
 
-            // Calculate max score
             let maxScore = -1;
             Object.values(nationScores).forEach(s => { if (s > maxScore) maxScore = s; });
 
@@ -662,7 +730,6 @@
             document.getElementById('input-family').value = `${info} ${selectedNation} ${rank}`;
         }
 
-        // Final Profile Output Generation
         function generateFinalOutput() {
             const name = document.getElementById('input-name').value || '익명';
             const height = document.getElementById('input-height').value || '170';
@@ -684,7 +751,6 @@
                 output += `- 출생: 888.${birth}, ${selectedNation}\n`;
                 output += `- 외모: ${appearanceStr}\n`;
 
-                // Relationships formatting
                 let relList = [];
                 chars.forEach(c => {
                     if (c.isKnow && c.affec) {
@@ -693,7 +759,6 @@
                 });
                 output += `- 타 캐릭터가 ${name}을(를) 대하는 감정(호칭): ${relList.length > 0 ? relList.join(', ') : '없음'}\n`;
 
-                // Misc Formatting
                 let extra = `(신분): ${family}`;
                 if (affiliationType === 'visitor') {
                     const reason = document.getElementById('input-visit-reason').value || '방문';
@@ -705,7 +770,6 @@
                 output += `- 기타${extra}`;
 
             } else {
-                // Short Procedure
                 output += `- 출생: ${selectedNation}\n`;
                 output += `- 외모: ${appearanceStr}\n`;
                 output += `- 타 캐릭터가 ${name}을(를) 대하는 감정(호칭): 없음\n`;
