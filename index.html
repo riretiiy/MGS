@@ -375,7 +375,7 @@
                             <img id="char-img" src="" alt="캐릭터 일러스트" class="w-full h-full object-cover">
                         </div>
 
-                        <!-- Centered Clean Info Stack (No Category Headings) -->
+                        <!-- Centered Clean Info Stack -->
                         <div class="space-y-1 pt-1 text-[11px] text-center">
                             <div id="char-birth-tag" class="text-purple-100 font-medium"></div>
                             <div id="char-body-tag" class="text-purple-100 font-medium"></div>
@@ -383,9 +383,9 @@
                             <div id="char-desc-tag" class="text-purple-200/80 leading-relaxed pt-1"></div>
                         </div>
 
-                        <!-- Dynamic Question -->
+                        <!-- Dynamic Question without Brackets -->
                         <div class="pt-3 border-t border-purple-500/20 text-center font-semibold text-purple-200 text-xs">
-                            &lt;<span id="q-title-tag"></span>&gt;<span id="q-suffix"></span> 아는 사이세요?
+                            <span id="q-text-full"></span>
                         </div>
                         
                         <div id="char-know-btns" class="grid grid-cols-2 gap-2 pt-1">
@@ -395,7 +395,7 @@
 
                         <!-- Relationship Details -->
                         <div id="char-relation-box" class="space-y-3 pt-2 hidden">
-                            <p class="text-[11px] text-purple-300/80 text-center">&lt;<span id="char-target-name"></span>&gt;이(가) 당신을 어떻게 생각하나요?</p>
+                            <p class="text-[11px] text-purple-300/80 text-center"><span id="char-target-name"></span>이(가) 당신을 어떻게 생각하나요?</p>
                             <div class="grid grid-cols-3 gap-1.5 text-xs">
                                 <button type="button" onclick="selectAffection('🖤 애증', this)" class="btn-affec p-2 rounded border border-purple-500/30">🖤 애증</button>
                                 <button type="button" onclick="selectAffection('🤎 혐오', this)" class="btn-affec p-2 rounded border border-purple-500/30">🤎 혐오</button>
@@ -505,6 +505,7 @@
                 key: '제논', 
                 fullname: '제논 헤번트',
                 title: '마탑주', 
+                qText: '마탑주랑 아는 사이세요?',
                 birth: '08.23 / 탄생화: 서양종려 (승리)',
                 body: '177cm / 생각보다 단단하고 근육질',
                 dept: '전투마법부 총괄',
@@ -518,6 +519,7 @@
                 key: '레비넌', 
                 fullname: '레비넌 베뉴아',
                 title: '부탑주', 
+                qText: '부탑주랑 아는 사이세요?',
                 birth: '02.10 / 탄생화: 서양서나무 (세심한 아름다움)',
                 body: '187cm / 날씬하고 수려한 체형',
                 dept: '연구지원부 총괄',
@@ -531,6 +533,7 @@
                 key: '체론', 
                 fullname: '체론 데로트',
                 title: '유망주', 
+                qText: '유망주를 알아요?',
                 birth: '04.13 / 탄생화: 페퍼민트 (진심)',
                 body: '184cm / 큰 체격',
                 dept: '연구지원부 - 내정지원부 - 7서클',
@@ -544,6 +547,7 @@
                 key: '비첼', 
                 fullname: '비첼 다즈민',
                 title: '그 애', 
+                qText: '그 애를 알아요?',
                 birth: '06.08 / 탄생화: 재스민 (사랑스러움)',
                 body: '182cm / 마른 근육 체형',
                 dept: '연구지원부 - 포션개량부',
@@ -558,11 +562,11 @@
         let selectedNation = '';
 
         const nationInfo = {
-            '로그넘': '대륙 중앙 반도 지형의 왕정 국가. 해상 무역 거점지이자 중립국.',
-            '라이덴바흐': '서대륙 정복 제국. 유일신교 고도 발달.',
-            '데노먼드': '서대륙 변방 샤머니즘 왕국. 이종 및 잡종 우호국.',
-            '그로셴하이츠': '동대륙 용 전설 황국. 강력한 모계 사회 및 명문 마탑.',
-            '아델린': '동대륙 휴양 섬 왕국. 왕실 내전 심각.'
+            '로그넘': '대륙 중앙에 위치한 반도 지형의 왕정 국가. 대륙 간 해상 무역의 거점지. 오랫동안 중립국 입장을 유지해 왔다.',
+            '라이덴바흐': '서대륙 중심을 차지한 거대한 제국. 정복 전쟁을 통해 국가를 강대하게 만들고, 각 소수민족을 하나로 연결하기 위해 유일신교가 고도로 발달했다.',
+            '데노먼드': '서대륙 변방의 소수민족 왕국. 다신교 샤머니즘이라는 독특한 종교체제가 발달했다. 마물 및 이종 간 출생자에게도 우호적인 유일한 국가.',
+            '그로셴하이츠': '동대륙의 황국. 초대 황제가 드래곤이었다는 전설이 있다. 황권이 강력하며 모계 사회다. 그로셴하이츠의 마탑과 아카데미는 대륙을 막론하고 제일의 명문으로 꼽힌다.',
+            '아델린': '동대륙 최서단에 위치한 왕정 국가. 사방이 바다로 둘러싸인 섬. 휴양지로서 큰 인기를 끌고 있다. 왕실 내전이 심각하다.'
         };
 
         function showModal(text, callback) {
@@ -630,10 +634,42 @@
             return str;
         }
 
-        // Validate MM.DD birth format strictly
         function isValidBirth(birthStr) {
             const regex = /^(0[1-9]|1[0-2])\.(0[1-9]|[12][0-9]|3[01])$/;
             return regex.test(birthStr);
+        }
+
+        // Improved Name Etymology Analyzer for Phonetic Korean Names
+        function analyzeNameOrigin(nameStr) {
+            let scores = { '로그넘': 0, '라이덴바흐': 0, '데노먼드': 0, '그로셴하이츠': 0, '아델린': 0 };
+            const clean = nameStr.replace(/\s+/g, '');
+
+            // Specific phonetic components check
+            if (/[엘아스엔리치카제밀반]/.test(clean)) scores['로그넘'] += 2;
+            if (/[프바하폰게데베르크슈만]/.test(clean)) scores['라이덴바흐'] += 2;
+            if (/[카크타파샤냐야우쿠]/.test(clean)) scores['데노먼드'] += 2;
+            if (/[폰하인슈황류강윤서진현신율]/.test(clean)) scores['그로셴하이츠'] += 2;
+            if (/[로아루미릴시아셀]/.test(clean)) scores['아델린'] += 2;
+
+            // Character count & structural tendencies
+            if (clean.length <= 3 && /[가-힣]/.test(clean)) {
+                // Typical Asian/Eastern sound -> Grossenheits or Denomond
+                scores['그로셴하이츠'] += 1;
+                scores['데노먼드'] += 1;
+            } else {
+                // Multi-syllable foreign sound -> Lognum or Adenlin or Ridenbach
+                scores['로그넘'] += 1;
+                scores['라이덴바흐'] += 1;
+                scores['아델린'] += 1;
+            }
+
+            let max = -1;
+            let tops = [];
+            Object.keys(scores).forEach(n => {
+                if (scores[n] > max) { max = scores[n]; tops = [n]; }
+                else if (scores[n] === max) tops.push(n);
+            });
+            return tops[Math.floor(Math.random() * tops.length)];
         }
 
         // Calculate single step score independently for popups
@@ -641,9 +677,7 @@
             let stepScores = { '로그넘': 0, '라이덴바흐': 0, '데노먼드': 0, '그로셴하이츠': 0, '아델린': 0 };
 
             if (stepNum === 1) {
-                const nameInput = userAnswers.rawName;
-                if (/[가-힣]/.test(nameInput)) stepScores['데노먼드'] += 2;
-                else stepScores['로그넘'] += 1;
+                return analyzeNameOrigin(userAnswers.rawName);
             } else if (stepNum === 3) {
                 const eye = userAnswers.eye;
                 const hair = userAnswers.hair;
@@ -676,8 +710,8 @@
         function getFinalRecommendedNation() {
             let total = { '로그넘': 0, '라이덴바흐': 0, '데노먼드': 0, '그로셴하이츠': 0, '아델린': 0 };
 
-            if (/[가-힣]/.test(userAnswers.rawName)) total['데노먼드'] += 2;
-            else total['로그넘'] += 1;
+            const nameEst = analyzeNameOrigin(userAnswers.rawName);
+            total[nameEst] += 2;
 
             const eye = userAnswers.eye;
             const hair = userAnswers.hair;
@@ -858,8 +892,8 @@
             document.getElementById('char-dept-tag').innerText = c.dept;
             document.getElementById('char-desc-tag').innerText = c.desc;
             
-            document.getElementById('q-title-tag').innerText = c.title;
-            document.getElementById('q-suffix').innerText = (c.title === '마탑주' || c.title === '부탑주') ? '랑' : '를';
+            // Clean direct question string without brackets
+            document.getElementById('q-text-full').innerText = c.qText;
 
             const imgEl = document.getElementById('char-img');
             imgEl.src = c.image;
@@ -898,7 +932,8 @@
             c.nickname = nicknameVal || userAnswers.shortName;
             document.getElementById('input-nickname').value = '';
 
-            showModal("음~ 그렇구나. 그럼…", () => nextCharDialog());
+            // Removed "음~ 그렇구나..." popup as requested -> direct transition
+            nextCharDialog();
         }
 
         function prevCharDialog() {
@@ -938,7 +973,7 @@
                         <div class="font-bold text-purple-200 text-xs flex items-center gap-1">
                             ${nat} ${isRecom ? '<span class="text-emerald-400 text-[10px] font-bold">[추천]</span>' : ''}
                         </div>
-                        <div class="text-[10px] text-purple-200/50 mt-0.5">${nationInfo[nat]}</div>
+                        <div class="text-[10px] text-purple-200/60 mt-1 leading-relaxed">${nationInfo[nat]}</div>
                     </div>
                 `;
                 list.appendChild(btn);
@@ -964,7 +999,6 @@
             document.getElementById('input-family').value = `${info} ${selectedNation} ${rank}`;
         }
 
-        // Random generator function per step
         function randomizeStep(stepNum) {
             if (stepNum === 1) {
                 const names = ['리안 베르', '카엘 시엘', '루시안 카일', '에반 로제', '강이현', '윤서진'];
@@ -1020,6 +1054,11 @@
             }
         }
 
+        // Format extra section to break lines at periods
+        function formatExtraText(rawExtra) {
+            return rawExtra.split('.').map(s => s.trim()).filter(s => s.length > 0).join('.\n');
+        }
+
         function generateFinalOutput() {
             const fullName = userAnswers.rawName || '익명';
             const shortName = userAnswers.shortName || '익명';
@@ -1054,15 +1093,16 @@
                 });
                 output += `- 타 캐릭터가 ${shortName}을(를) 대하는 감정(호칭): ${relList.length > 0 ? relList.join(', ') : '없음.'}\n`;
 
-                let extra = `(신분): ${family}`;
+                let rawExtra = `(신분): ${family}`;
                 if (userAnswers.affiliationType === 'visitor') {
                     const reason = document.getElementById('input-visit-reason').value || '방문';
-                    extra += ` / 마탑 방문자 (${reason})`;
+                    rawExtra += `. 마탑 방문자 (${reason})`;
                 } else if (userAnswers.affiliationType === 'member') {
                     const circleStr = (userAnswers.manaCircle === '마력이 없음') ? '이론부' : userAnswers.manaCircle;
-                    extra += ` / 마탑 소속 (${userAnswers.mainDept}-${userAnswers.subDept}-${circleStr})`;
+                    rawExtra += `. 마탑 소속 (${userAnswers.mainDept}-${userAnswers.subDept}-${circleStr})`;
                 }
-                output += `- 기타${extra}`;
+                
+                output += `- 기타${formatExtraText(rawExtra)}`;
 
             } else {
                 output += `- 출생: ${selectedNation}\n`;
