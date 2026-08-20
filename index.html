@@ -397,12 +397,12 @@
                         <div id="char-relation-box" class="space-y-3 pt-2 hidden">
                             <p class="text-[11px] text-purple-300/80 text-center"><span id="char-target-name"></span>이(가) 당신을 어떻게 생각하나요?</p>
                             <div class="grid grid-cols-3 gap-1.5 text-xs">
-                                <button type="button" onclick="selectAffection('🖤 애증', this)" class="btn-affec p-2 rounded border border-purple-500/30">🖤 애증</button>
-                                <button type="button" onclick="selectAffection('🤎 혐오', this)" class="btn-affec p-2 rounded border border-purple-500/30">🤎 혐오</button>
-                                <button type="button" onclick="selectAffection('🩶 어색', this)" class="btn-affec p-2 rounded border border-purple-500/30">🩶 어색</button>
+                                <button type="button" onclick="selectAffection('🖤 혐오', this)" class="btn-affec p-2 rounded border border-purple-500/30">🖤 애증</button>
+                                <button type="button" onclick="selectAffection('💙 불쾌', this)" class="btn-affec p-2 rounded border border-purple-500/30">🤎 혐오</button>
+                                <button type="button" onclick="selectAffection('🩵 어색', this)" class="btn-affec p-2 rounded border border-purple-500/30">🩶 어색</button>
                                 <button type="button" onclick="selectAffection('💛 우정', this)" class="btn-affec p-2 rounded border border-purple-500/30">💛 우정</button>
-                                <button type="button" onclick="selectAffection('❤️ 호감', this)" class="btn-affec p-2 rounded border border-purple-500/30">❤️ 호감</button>
-                                <button type="button" onclick="selectAffection('🩷 사랑', this)" class="btn-affec p-2 rounded border border-purple-500/30">🩷 사랑</button>
+                                <button type="button" onclick="selectAffection('🧡 호감', this)" class="btn-affec p-2 rounded border border-purple-500/30">❤️ 호감</button>
+                                <button type="button" onclick="selectAffection('❤️ 사랑', this)" class="btn-affec p-2 rounded border border-purple-500/30">🩷 사랑</button>
                             </div>
                             <div id="char-nickname-box" class="space-y-2 hidden">
                                 <label class="block text-purple-300/80 text-[11px]">
@@ -536,7 +536,7 @@
                 qText: '유망주를 알아요?',
                 birth: '04.13 | 탄생화: 페퍼민트 (진심)',
                 body: '184cm, 큰 체격',
-                dept: '연구지원부 - 내정지원부 - 7서클',
+                dept: '연구지원부 - 내정지원부',
                 desc: '그로셴하이츠 명문 무가인 데로트 백작가의 삼남.\n아카데미를 수석 졸업 후 스카웃 되었으나 마법보다 상업적 재능으로 더 유명함.\n가장 유명한 소문이라면 역시 제국에서 손 꼽히는 영앤리치라는 점이겠죠!\n아델린으로 휴가 가는 걸 좋아한대요. 부럽다~…', 
                 image: 'cheron.PNG', 
                 isKnow: false, 
@@ -1001,12 +1001,12 @@
 
         function randomizeStep(stepNum) {
             if (stepNum === 1) {
-                const names = ['카르마 노비움', '녹센부르크 시엘', '헤르츠 베넘', '에반 제이슨', '강이현', '윤랑랑'];
+                const names = ['카르마 노비움', '녹센부르크 시엘', '헤르츠 베넘', '제갈 민', '사쿠라기 히나', '허 셴웨이', '에반 제이슨', '벤슨 카일', '마뉴 아제리아', '강 이현', '윤 랑랑'];
                 document.getElementById('input-name').value = names[Math.floor(Math.random() * names.length)];
                 setGender(Math.random() > 0.5 ? '男' : '女');
             } else if (stepNum === 2) {
                 document.getElementById('input-height').value = Math.floor(Math.random() * 30) + 160;
-                const builds = ['슬림한 체격', '보통 체구', '탄탄한 근육질', '마른 체형'];
+                const builds = ['슬림한 체격', '모델 체형', '보기 드문 거구', '베이글', '보통 체구', '탄탄한 근육질', '마른 체형'];
                 document.getElementById('input-build').value = builds[Math.floor(Math.random() * builds.length)];
             } else if (stepNum === 3) {
                 const eyes = ['호박색', '푸른빛', '검은색', '적안', '금안'];
